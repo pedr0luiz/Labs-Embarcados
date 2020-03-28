@@ -88,15 +88,15 @@ void TC1_Handler(void){
 	flag_tc = 1;
 }
 
-// void TC0_Handler(void){
-// 	volatile uint32_t ul_dummy;
-// 
-// 	ul_dummy = tc_get_status(TC0, 1);
-// 
-// 	UNUSED(ul_dummy);
-// 
-// 	flag_tc0 = 1;
-// }
+void TC0_Handler(void){
+	volatile uint32_t ul_dummy;
+
+	ul_dummy = tc_get_status(TC0, 0);
+
+	UNUSED(ul_dummy);
+
+	flag_tc0 = 1;
+}
 static void RTT_init(uint16_t pllPreScale, uint32_t IrqNPulses){
 	uint32_t ul_previous_time;
 
@@ -200,7 +200,7 @@ int main (void){
 	delay_init();
 	
 	TC_init(TC0, ID_TC1, 1, 4);
-/*	TC_init(TC0, ID_TC0, 0, 4);*/
+	TC_init(TC0, ID_TC0, 0, 5);
 	
 	calendar rtc_initial = {2018, 3, 19, 12, 15, 45 ,1};
 	RTC_init(RTC, ID_RTC, rtc_initial, RTC_IER_ALREN);
@@ -215,10 +215,10 @@ int main (void){
 			pin_toggle(LED1_PIO, LED1_IDX_MASK);
 			flag_tc = 0;
 		}
-// 		if(flag_tc0){
-// 			pin_toggle(LED3_PIO, LED3_IDX_MASK);
-// 			flag_tc0 = 0;
-// 		}
+		if(flag_tc0){
+			pin_toggle(LED3_PIO, LED3_IDX_MASK);
+			flag_tc0 = 0;
+		}
 		if (flag_rtt){
 		  pin_toggle(LED2_PIO, LED2_IDX_MASK);
 		  
