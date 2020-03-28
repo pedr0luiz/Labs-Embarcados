@@ -32,6 +32,7 @@ volatile char flag_tc = 0;
 volatile char flag_tc0 = 0;
 volatile char flag_rtt = 1;
 volatile char flag_rtc = 0;
+volatile char flag_rtc_sec = 0;
 
 typedef struct  {
 	uint32_t year;
@@ -160,6 +161,7 @@ void RTC_Handler(void){
 	*  ou Alarm
 	*/
 	if ((ul_status & RTC_SR_SEC) == RTC_SR_SEC) {
+		flag_rtc_sec = 1;
 		rtc_clear_status(RTC, RTC_SCCR_SECCLR);
 	}
 	
@@ -203,17 +205,27 @@ int main (void){
 	TC_init(TC0, ID_TC0, 0, 5);
 	
 	calendar rtc_initial = {2018, 3, 19, 12, 15, 45 ,1};
-	RTC_init(RTC, ID_RTC, rtc_initial, RTC_IER_ALREN);
+	RTC_init(RTC, ID_RTC, rtc_initial, RTC_IER_ALREN | RTC_SR_SEC);
 	rtc_set_date_alarm(RTC, 1, rtc_initial.month, 1, rtc_initial.day);
 	rtc_set_time_alarm(RTC, 1, rtc_initial.hour, 1, rtc_initial.minute, 1, rtc_initial.seccond + 20);
 	
+	uint32_t hour;
+	uint32_t minute;
+	uint32_t second;
+	char timeString[512];
+	
 	gfx_mono_ssd1306_init();
-	gfx_mono_draw_string("mundo", 50,16, &sysfont);
 
 	while(1) {
 		if(flag_tc){
 			pin_toggle(LED1_PIO, LED1_IDX_MASK);
 			flag_tc = 0;
+		}
+		if(flag_rtc_sec){
+			rtc_get_time(RTC, &hour, &minute, &second);
+			sprintf(timeString, "%2d:%2d:%2d", hour, minute, second);
+			gfx_mono_draw_string(timeString, 50, 16, &sysfont);
+			flag_rtc_sec = 0;
 		}
 		if(flag_tc0){
 			pin_toggle(LED3_PIO, LED3_IDX_MASK);
