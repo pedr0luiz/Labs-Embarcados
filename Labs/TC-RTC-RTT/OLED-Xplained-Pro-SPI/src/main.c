@@ -16,7 +16,7 @@
 #define LED2_IDX      30
 #define LED2_IDX_MASK (1 << LED2_IDX)
 
-// LED2 PB2
+// LED3 PB2
 #define LED3_PIO      PIOB
 #define LED3_PIO_ID   ID_PIOB
 #define LED3_IDX      2
